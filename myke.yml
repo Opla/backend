@@ -33,3 +33,7 @@ tasks:
       opla migrations up
       yarn lint
       yarn test
+
+  clean_pv:
+    cmd: |-
+      kubectl -n {{.K8S_NAMESPACE}} delete pvc data-{{.K8S_NAMESPACE}}-{{.APPLICATION_SHORT_NAME}}-mariadb-master-0 data-{{.K8S_NAMESPACE}}-{{.APPLICATION_SHORT_NAME}}-mariadb-slave-0 || true
