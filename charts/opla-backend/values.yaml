@@ -14,8 +14,6 @@ db:
     botId: yvUrUr20GwaWvPUoLpIVhwvg6u72rcOc3mv4MUbDJjeRnERI
     botUserId: QFmiA1RpYZ3DtXL57WmWOMurm3yNxn8R
 
-db_host: db
-
 tls: false
 
 namespace: dev-ce
@@ -23,12 +21,14 @@ namespace: dev-ce
 api:
   domain: localhost
 
-
 db_mode: embedded
 # db_mode: persistent # This is the persistent mariadb StatefulSet.
 # db_mode: none 
 
 # Values for mariadb persistent dependency
+
+embedded_db:
+  host: db
 
 mariadb:
   enabled: false
