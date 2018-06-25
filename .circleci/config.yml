@@ -131,7 +131,7 @@ workflows:
             branches:
               only: 
                 - master
-                - publish-chart
+                - infra-update
       - deploy_qa:
           requires:
             - promote
