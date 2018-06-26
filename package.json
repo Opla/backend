@@ -1,0 +1,22 @@
+{
+  "name": "backend-helm-repository",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "yaml-validator index.yaml"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/opla/backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/opla/backend/issues"
+  },
+  "homepage": "https://github.com/opla/backend#readme",
+  "devDependencies": {
+    "yaml-validator": "^1.3.0"
+  }
+}
