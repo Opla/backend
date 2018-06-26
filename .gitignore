@@ -4,5 +4,8 @@ dist/
 lib/
 node_modules/
 .vscode/
-/k8s/tmp/
 values.dev.yaml
+*.env.local
+
+# Chart dependencies
+**/charts/*.tgz

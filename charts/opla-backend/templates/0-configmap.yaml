@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-scripts
+  namespace: {{ .Values.namespace }}
+data:
+{{- if eq .Values.db.createApplication true }}
+{{ $root := . -}}
+{{- range $path, $bytes := .Files.Glob "sql/**.sql" }}
+{{- $path | base | indent 2 }}: |-
+{{ tpl ($root.Files.Get $path) $root | indent 4 }}
+
+{{ end -}}
+{{ end -}}
