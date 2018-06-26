@@ -37,3 +37,5 @@ mariadb:
     user: opla
     password: foo
   nameOverride: mariadb
+  master.livenessProbe.failureThreshold: 40
+  slave.replicas: 0
