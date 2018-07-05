@@ -79,7 +79,7 @@ jobs:
           gcloud container clusters get-credentials ${GCLOUD_CLUSTER_ID} --zone=${GOOGLE_COMPUTE_ZONE}
           helm init --service-account tiller --upgrade
           COMMIT_SHA=$CIRCLE_SHA1 myke preview
-          COMMIT_SHA=$CIRCLE_SHA1 HELM_XTRA_ARGS="--set tls=true" myke deploy
+          COMMIT_SHA=$CIRCLE_SHA1 HELM_XTRA_ARGS="--set tls=false" myke deploy
       - run: |
           export K8S_NAMESPACE=circleci-$CIRCLE_BUILD_NUM
           retry -s 1 -t 60 myke e2e_test
