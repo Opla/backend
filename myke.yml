@@ -8,6 +8,11 @@ mixin:
   - infra/mixin/ci
 
 env:
+  K8S_ENV: dev
+  K8S_NAMESPACE: dev-ce
+  APPLICATION_NAME: opla-backend
+  APPLICATION_SHORT_NAME: backend
+  CHART_VERSION_SEM: 0.1.0
   REPO: Opla/backend
   TAG: latest
   CHART_DIR: charts/opla-backend
