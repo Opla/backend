@@ -48,7 +48,7 @@ jobs:
       - run: bin/opla migrations up
       - run: yarn lint
       - run: yarn test
-      
+  
   build:
     docker: 
       - image: licarth/ci-cd:latest
@@ -62,6 +62,25 @@ jobs:
       - setup_remote_docker
       - run: *dockerauth
       - run: myke backend/ci_build --COMMIT_SHA=$CIRCLE_SHA1
+
+  e2e_test:
+    docker:
+      - image: licarth/ci-cd:latest
+    environment: 
+      K8S_ENV: dev
+      K8S_NAMESPACE: circleci-$CIRCLE_BUILD_NUM
+      GCLOUD_CLUSTER_ID: qa
+
+    steps:
+      - checkout
+      - run: *initsubmodules
+      - run: *gcloudauth
+      - run: *deploy
+      - run: retry -s 1 -t 60 myke e2e_test
+      - run:
+          command: kubectl delete ns circleci-$CIRCLE_BUILD_NUM
+          when: always
+
   promote:
     docker: 
       - image: licarth/ci-cd:latest
@@ -128,10 +147,12 @@ workflows:
             tags:
               only: /.*/
       - build
-      - promote:
+      - e2e_test:
           requires:
             - build
-            - test
+      - promote:
+          requires:
+            - e2e_test
           filters:
             branches:
               only: 
