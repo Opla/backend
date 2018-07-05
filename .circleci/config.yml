@@ -70,7 +70,7 @@ jobs:
       K8S_ENV: qa
       K8S_NAMESPACE: circleci-$CIRCLE_BUILD_NUM
       GCLOUD_CLUSTER_ID: qa
-      HELM_XTRA_ARGS: "--settls=true"
+      HELM_XTRA_ARGS: "--set tls=true"
 
     steps:
       - checkout
