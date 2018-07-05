@@ -46,7 +46,7 @@ tasks:
   e2e_test:
     cmd: |-
       IP=$(kubectl get svc nginx-ingress-controller -o jsonpath='{.status.loadBalancer.ingress.*.ip}')
-      curl --fail "http://{{.K8S_NAMESPACE}}.$IP.xip.io/auth/access_token" \
+      STATUS_CODE=$(curl -o /dev/null -s -w "%{http_code}\n" "http://{{.K8S_NAMESPACE}}.$IP.xip.io/auth/access_token" \
       -H "origin: http://{{.K8S_NAMESPACE}}.$IP.xip.io" \
       -H 'accept-encoding: gzip, deflate, br' \
       -H 'accept-language: fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7,en-GB;q=0.6,de;q=0.5' \
@@ -54,5 +54,8 @@ tasks:
       -H 'content-type: application/json' \
       -H 'accept: */*' \
       -H "referer: http://{{.K8S_NAMESPACE}}.$IP.xip.io" \
-      --data-binary '{"username":"admin","password":"password","client_id":"xxmtlkZAre2aEj6AgVtat31wStpehwthfT0bpMRBEJ3lmb683ZBwbclxDiIWxG4u","redirect_uri":"localhost","grant_type":"password"}' \
-      --compressed
+      --data-binary '{"username":"admin","password":"password","client_id":"{{.CLIENT_ID}}","redirect_uri":"localhost","grant_type":"password"}' \
+      --compressed)
+      if [ "$STATUS_CODE" != 200 ]; then
+        exit 1
+      fi;
