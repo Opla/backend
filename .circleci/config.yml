@@ -13,7 +13,7 @@ __steps:
         gcloud container clusters get-credentials ${GCLOUD_CLUSTER_ID} --zone=${GOOGLE_COMPUTE_ZONE}
         helm init --service-account tiller --upgrade
         COMMIT_SHA=$CIRCLE_SHA1 myke preview
-        COMMIT_SHA=$CIRCLE_SHA1 myke deploy --HELM_XTRA_ARGS=$HELM_XTRA_ARGS
+        COMMIT_SHA=$CIRCLE_SHA1 HELM_XTRA_ARGS=$HELM_XTRA_ARGS myke deploy
   - run: &notify0
       when: on_success
       command: TEST_RESULT=0 DOMAIN="$K8S_NAMESPACE.$DOMAIN" myke backend/_circle_notify
@@ -70,7 +70,7 @@ jobs:
       K8S_ENV: qa
       K8S_NAMESPACE: circleci-$CIRCLE_BUILD_NUM
       GCLOUD_CLUSTER_ID: qa
-      HELM_XTRA_ARGS: "--set tls=false"
+      HELM_XTRA_ARGS: "--settls=true"
 
     steps:
       - checkout
@@ -79,7 +79,7 @@ jobs:
       - run: *deploy
       - run: retry -s 1 -t 60 myke e2e_test
       - run:
-          command: kubectl delete ns circleci-$CIRCLE_BUILD_NUM
+          command: echo $HELM_XTRA_ARGS && kubectl delete ns circleci-$CIRCLE_BUILD_NUM
           when: always
 
   promote:
