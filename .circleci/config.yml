@@ -67,7 +67,7 @@ jobs:
     docker:
       - image: licarth/ci-cd:latest
     environment: 
-      K8S_ENV: dev
+      K8S_ENV: qa
       K8S_NAMESPACE: circleci-$CIRCLE_BUILD_NUM
       GCLOUD_CLUSTER_ID: qa
 
