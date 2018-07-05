@@ -68,7 +68,6 @@ jobs:
       - image: licarth/ci-cd:latest
     environment: 
       K8S_ENV: qa
-      K8S_NAMESPACE: circleci-$CIRCLE_BUILD_NUM
       GCLOUD_CLUSTER_ID: qa
 
     steps:
@@ -76,13 +75,16 @@ jobs:
       - run: *initsubmodules
       - run: *gcloudauth
       - run: |
+          export K8S_NAMESPACE=circleci-$CIRCLE_BUILD_NUM
           gcloud container clusters get-credentials ${GCLOUD_CLUSTER_ID} --zone=${GOOGLE_COMPUTE_ZONE}
           helm init --service-account tiller --upgrade
           COMMIT_SHA=$CIRCLE_SHA1 myke preview
           COMMIT_SHA=$CIRCLE_SHA1 HELM_XTRA_ARGS="--set tls=true" myke deploy
       - run: retry -s 1 -t 60 myke e2e_test
       - run:
-          command: echo $HELM_XTRA_ARGS && kubectl delete ns circleci-$CIRCLE_BUILD_NUM
+          command: |
+            export K8S_NAMESPACE=circleci-$CIRCLE_BUILD_NUM
+            echo $HELM_XTRA_ARGS && kubectl delete ns circleci-$CIRCLE_BUILD_NUM
           when: always
 
   promote:
