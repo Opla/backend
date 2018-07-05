@@ -13,7 +13,7 @@ __steps:
         gcloud container clusters get-credentials ${GCLOUD_CLUSTER_ID} --zone=${GOOGLE_COMPUTE_ZONE}
         helm init --service-account tiller --upgrade
         COMMIT_SHA=$CIRCLE_SHA1 myke preview
-        COMMIT_SHA=$CIRCLE_SHA1 HELM_XTRA_ARGS=$HELM_XTRA_ARGS myke deploy
+        COMMIT_SHA=$CIRCLE_SHA1 HELM_XTRA_ARGS="$HELM_XTRA_ARGS" myke deploy
   - run: &notify0
       when: on_success
       command: TEST_RESULT=0 DOMAIN="$K8S_NAMESPACE.$DOMAIN" myke backend/_circle_notify
@@ -78,7 +78,6 @@ jobs:
           export K8S_NAMESPACE=circleci-$CIRCLE_BUILD_NUM
           gcloud container clusters get-credentials ${GCLOUD_CLUSTER_ID} --zone=${GOOGLE_COMPUTE_ZONE}
           helm init --service-account tiller --upgrade
-          COMMIT_SHA=$CIRCLE_SHA1 myke preview
           COMMIT_SHA=$CIRCLE_SHA1 HELM_XTRA_ARGS="--set tls=false" myke deploy
       - run: |
           export K8S_NAMESPACE=circleci-$CIRCLE_BUILD_NUM
@@ -161,6 +160,7 @@ workflows:
       - promote:
           requires:
             - e2e_test
+            - test
           filters:
             branches:
               only: 
