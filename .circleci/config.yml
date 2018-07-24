@@ -225,14 +225,3 @@ workflows:
     jobs:
       - backup_prod
       - backup_preprod
-  backup_night:
-    triggers:
-      - schedule:
-          cron: "0 21-7 * * *"
-          filters:
-            branches:
-              only:
-                - master
-    jobs:
-      - backup_prod
-      - backup_preprod
