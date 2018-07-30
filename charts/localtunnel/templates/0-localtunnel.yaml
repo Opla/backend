@@ -1,0 +1,70 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: localtunnel
+spec:
+  selector:
+    app: localtunnel
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: localtunnel
+  labels:
+    app: localtunnel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: localtunnel
+  template:
+    metadata:
+      labels:
+        app: localtunnel
+    spec:
+      containers:
+      - name: node
+        image: "defunctzombie/localtunnel-server:latest"
+        args: ["--port", "3000"]
+        ports:
+        - containerPort: 3000
+        readinessProbe:
+          httpGet:
+            path: /api/status
+            port: 3000
+          initialDelaySeconds: 3
+          periodSeconds: 3
+
+--- 
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: localtunnel-ingress
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "false"
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: "true"
+    certmanager.k8s.io/cluster-issuer: "letsencrypt-prod"
+
+spec:
+  rules:
+   # Allows access via
+   # http://<namespace>.<nginx_svc_load_balancer_ip>.xip.io.
+   # See https://github.com/kubernetes/kubernetes/issues/41881
+  - host: localtunnel.k8s.opla.ai
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: localtunnel
+          servicePort: 80
+  tls:
+    - secretName: localtunnel-tls
+      hosts:
+        - localtunnel.k8s.opla.ai
