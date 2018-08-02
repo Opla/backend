@@ -49,42 +49,18 @@ quickly.
 
 This application should be available at: http://127.0.0.1:8081/.
 
-
 ## Database migrations
 
-We use [db-migrate](http://db-migrate.readthedocs.io/en/latest/) to manage the
+We use [flyway](https://flywaydb.org/documentation/) to manage the
 database migrations with a specific configuration for this project. By using the
 `bin/opla` tool, this configuration is automatically generated and `db-migrate`
-is bound to the `bin/opla migrations` command. Do not run `db-migrate` directly
-(it should complain about not finding the configuration file anyway).
+is bound to the `bin/opla migrations` command.
 
 ### Creating a migration
 
-1. Run:
+1. Read about terminology here : https://flywaydb.org/documentation/migrations.
 
-   ```
-   $ bin/opla migrations create "short explanation of the migration"
-   ```
-
-   The `"short explanation of the migration"` will be used in the migration
-   filename (see the content of the [`migrations/`](migrations/) folder for some
-   examples). Choose something short and self-explanatory.
-
-   This command will create several files, all of them should be put into Git.
-   You should not have to care about the generated JavaScript files as writing
-   migrations in plain SQL is much easier. In addition, you should not deal with
-   the `down` migrations, since database rollbacks never work in practice, we
-   only go forward.
-
-2. Write your migration in plain SQL in the generated file:
-
-
-   ```
-   echo "<SQL STATEMENT>;" > migrations/sqls/20180307110023-short-explanation-of-the-migration-up.sql
-   ```
-
-   Then, you can apply this migration and make sure everything works as
-   intended.
+2. Add your migration file to this repo under [migrations/sqls](https://github.com/Opla/backend/tree/master/migrations/sqls)
 
 ### Applying migrations
 
@@ -107,6 +83,59 @@ The CI/CD pipeline produces a Docker image that you can use to run the Backend.
 | OPLA_BACKEND_DATABASE_NAME | opla_dev | Database name                                                                                                                       |
 | OPLA_BACKEND_DATABASE_USER | opla     | Database user                                                                                                                       |
 | OPLA_BACKEND_DATABASE_PASS | foo      | Database password                                                                                                                   |
+
+## Deploying to kubernetes
+This repo contains a kubernetes chart to deploy opla-backend on a kubernetes cluster.
+
+Once you have a cluster, you can deploy opla-backend, with or without HTTPS, persistence.
+
+### TL;DR
+There is a shortcut, if you have `myke`. See below :
+You can deploy the FE, with TLS :
+
+Given that you have a domain, you can deploy the backend with :
+
+```
+myke deploy --HELM_XTRA_ARGS="--set api.domain=YOUR_DOMAIN"
+```
+
+### Requirements
+
+You will need :
+
+- (**required**) a Kubernetes cluster with LoadBalancer support. 
+- (**required**) [`nginx-ingress-controller`](https://github.com/helm/charts/tree/master/stable/nginx-ingress) with an IP. Even better if you have a domain name pointing to that IP.
+- (**required**) `kubectl` locally
+- (**required**) [`myke`](https://github.com/goeuro/myke/) (a yaml version of `make`/Makefile) locally. See [here](https://github.com/goeuro/myke/releases) for installation.`
+- (**required**) [`tiller`, `helm`](https://docs.helm.sh/using_helm/)
+- (optional) [`cert-manager`](https://github.com/helm/charts/tree/master/stable/cert-manager) for let's encrypt certificates, if needed.
+- (optional) [`external-storage/snapshots`](https://github.com/kubernetes-incubator/external-storage/tree/master/snapshot) for snapshots and backups of your database, if you need them.
+
+### Installation
+
+Helm charts get published at https://opla.github.io/backend
+You can fetch charts this way : 
+```
+helm repo add opla-backend https://opla.github.io/backend
+helm repo update
+helm fetch opla-backend/opla-backend
+```
+
+You can then install opla like any other helm application, and edit configuration by specifying your [values.yaml](https://github.com/Opla/backend/blob/master/charts/opla-backend/values.yaml) or using `helm --set ...`.
+
+```
+helm repo add opla-backend https://opla.github.io/backend
+helm upgrade --install --namespace <YOUR_NAMESPACE> \
+  --set namespace=<YOUR_NAMESPACE> \
+  --set api.domain=<YOUR_DOMAIN> \
+  backend opla-backend/opla-backend
+```
+TIP: You can use --set api.domain=$IP.xip.io as domain name if you only have an IP for your loadbalancer. 
+
+Your app is then available at http://<YOUR_NAMESPACE>.<YOUR_DOMAIN>/api/v1
+
+In general, if you need more details about how we deploy opla, you can have a look at our [CircleCI config.yaml](https://github.com/Opla/backend/blob/master/.circleci/config.yml), where we run commands to deploy it.
+
 ## Contributing
 
 Please, see the [CONTRIBUTING](CONTRIBUTING.md) file.

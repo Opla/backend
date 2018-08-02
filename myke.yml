@@ -87,4 +87,3 @@ tasks:
       #   --set mariadb.master.persistence.storageClass=\"snapshot-promoter\" \
       #   --set mariadb.master.persistence.annotations={\"snapshot.alpha.kubernetes.io/snapshot=snapshot-mariadb\"} \
       #   "
-
