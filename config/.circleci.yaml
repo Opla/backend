@@ -1,0 +1,10 @@
+workflows:
+  version: 2
+
+  build:
+    jobs:
+      - job1:
+          branches:
+            ignore:
+              - gh-pages
+
