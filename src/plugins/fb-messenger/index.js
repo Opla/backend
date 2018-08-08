@@ -33,12 +33,14 @@ class FBMessenger {
   }
 
   async register(middleware) {
+    logger.warn("plugin fb-messenger register");
     // TODO
     this.middleware = middleware;
     return middleware;
   }
 
   async unregister(middleware) {
+    logger.warn("plugin fb-messenger unregister");
     // TODO
     this.middleware = null;
     return middleware;

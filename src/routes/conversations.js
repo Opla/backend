@@ -42,6 +42,7 @@ export default class extends CommonRoutes {
   async newConversation(context) {
     const me = await this.access(context);
     const params = context.getBody();
+    logger.warn("newConversation", params);
     const payload = await this.extensions
       .getMessenger()
       .createConversation(me, params);

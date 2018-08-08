@@ -7,6 +7,7 @@
 // TODO remove import and use dynamic loading
 import OpenNLXMiddleware from "./openNLX";
 import PublishConnectorMiddleware from "./publishConnector";
+import FbMessengerConnectorMiddleware from "./fbMessengerConnector";
 
 const initMiddlewares = (middlewaresManager, controllers) => {
   // TODO dynamic loading
@@ -18,5 +19,8 @@ const initMiddlewares = (middlewaresManager, controllers) => {
 
   const connectorMiddleware = new PublishConnectorMiddleware(controllers);
   middlewaresManager.attach(connectorMiddleware.getProperties());
+
+  const fbMessengerMiddleware = new FbMessengerConnectorMiddleware(controllers);
+  middlewaresManager.attach(fbMessengerMiddleware.getProperties());
 };
 export default initMiddlewares;

@@ -4,16 +4,20 @@
  * This source code is licensed under the GPL v2.0+ license found in the
  * LICENSE file in the root directory of this source tree.
  */
+// import fetch from "node-fetch";
 import BotsRoutes from "./bots";
 import ConversationsRoutes from "./conversations";
 import MetricsRoutes from "./metrics";
 import AdminRoute from "./admin";
+import FBMessengerRoutes from "./fbMessenger";
 
 export default (zoapp) => {
   const conversations = new ConversationsRoutes(zoapp);
   const bots = new BotsRoutes(zoapp);
   const metrics = new MetricsRoutes(zoapp);
   const admin = new AdminRoute(zoapp);
+  const fbMessenger = new FBMessengerRoutes(zoapp);
+  // const fbMessengerRoute = new FBMessengerRoute(zoapp);
 
   // /conversations routes
   // List all conversations linked to session
@@ -47,6 +51,54 @@ export default (zoapp) => {
     ["*", "admin", "master"],
     conversations.newMessage,
   );
+
+  // route = zoapp.createRoute("/fb");
+  // // facebook messenger callback url
+  // route.add(
+  //   "GET",
+  //   "/webhook",
+  //   ["*", "open"],
+  //   (context) => {
+  //     logger.warn("get webhook");
+  //     logger.warn("context params", context.getParams());
+  //     const query = context.getQuery();
+  //     logger.warn("context query", query);
+  //     logger.warn("context query hub.challenge", query["hub.challenge"]);
+  //     logger.warn("context body", context.getBody());
+  //     logger.warn("context", typeof context);
+  //     logger.warn(Object.keys(context));
+  //     logger.warn(context.access);
+  //     if (query && query["hub.verify_token"] === "token943") {
+  //       const c = query["hub.challenge"];
+  //       return parseInt(c, 10);
+  //       // return JSON.stringify(c);
+  //     }
+  //     return "error on token";
+  //   },
+  //   () => true,
+  // );
+
+  route = zoapp.createRoute("/fb");
+  // facebook messenger callback url
+  route.add(
+    "GET",
+    "/webhook",
+    ["*", "open"],
+    (context) => {
+      const verifyToken = "token943";
+      logger.warn("get webhook");
+      const query = context.getQuery();
+      if (query && query["hub.verify_token"] === verifyToken) {
+        const c = query["hub.challenge"];
+        return parseInt(c, 10);
+        // return JSON.stringify(c);
+      }
+      return "error on token";
+    },
+    () => true,
+  );
+
+  route.add("POST", "/webhook", ["*", "open"], fbMessenger.newMessage);
 
   // /bots routes
   route = zoapp.createRoute("/bots");
