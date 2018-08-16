@@ -1,6 +1,7 @@
 # opla-backend
 
-[![CircleCI](https://circleci.com/gh/Opla/backend.svg?style=svg)](https://circleci.com/gh/Opla/backend)
+[![Build
+Status](https://travis-ci.org/Opla/backend.svg?branch=master)](https://travis-ci.org/Opla/backend)
 
 Opla.ai Backend using Node es7 react and redux.
 

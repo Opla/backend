@@ -1,0 +1,11 @@
+db:
+  name: opla_dev
+  user: opla
+  password: foo
+nameOverride: db
+master:
+  antiAffinity: hard
+slave:
+  replicas: 0
+rootUser: 
+  password: changeit #Needed, otherwise redeployments fail.

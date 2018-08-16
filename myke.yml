@@ -45,7 +45,7 @@ tasks:
 
   clean_pv:
     cmd: |-
-      kubectl -n {{.K8S_NAMESPACE}} delete pvc data-{{.K8S_NAMESPACE}}-{{.APPLICATION_SHORT_NAME}}-mariadb-master-0 data-{{.K8S_NAMESPACE}}-{{.APPLICATION_SHORT_NAME}}-mariadb-slave-0 || true
+      kubectl -n {{.K8S_NAMESPACE}} delete pvc data-{{.K8S_NAMESPACE}}-{{.APPLICATION_SHORT_NAME}}-mariadb-master-0 || true
 
       
   e2e_test:
@@ -75,16 +75,17 @@ tasks:
   
   restore_db:
     cmd: |-
-        # helm delete {{.K8S_NAMESPACE}}-{{.APPLICATION_SHORT_NAME}} || true
-        # $myke clean_pv
+        kubectl get volumesnapshot {{.SNAPSHOT_NAME}} -o json --namespace {{.FROM_NS}} | jq '.metadata.namespace = "{{.K8S_NAMESPACE}}"' | kubectl create -f - || true
+        # helm delete --purge {{.K8S_NAMESPACE}}-{{.APPLICATION_SHORT_NAME}} || true
+        $myke clean_pv
+        kubectl create ns {{.K8S_NAMESPACE}} || true
         helm template \
-          --set backupDate={{.BACKUP_DATE}} \
+          --set snapshotName={{.SNAPSHOT_NAME}} \
           --set namespace={{.K8S_NAMESPACE}} \
+          --set fromNamespace={{.FROM_NS}} \
           charts/snapshot-restore/ \
         | kubectl apply -f -
-        $myke deploy
-      # $myke deploy --HELM_XTRA_ARGS="\
-      #   --set mariadb.master.persistence.storageClass=\"snapshot-promoter\" \
-      #   --set mariadb.master.persistence.annotations={\"snapshot.alpha.kubernetes.io/snapshot=snapshot-mariadb\"} \
-      #   "
-
+        # $myke deploy --HELM_XTRA_ARGS="\
+        # --set mariadb.master.persistence.storageClass=\"snapshot-promoter\" \
+        # --set mariadb.master.persistence.annotations={\"snapshot.alpha.kubernetes.io/snapshot=mariadb-{{.BACKUP_DATE}}\"} \
+        # "

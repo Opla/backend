@@ -4,7 +4,7 @@ metadata:
   name: data-{{.Values.namespace}}-backend-mariadb-master-0
   namespace: {{.Values.namespace}}
   annotations:
-    snapshot.alpha.kubernetes.io/snapshot: snapshot-mariadb-{{.Values.backupDate}}
+    snapshot.alpha.kubernetes.io/snapshot: {{.Values.snapshotName}}
 spec:
   accessModes:
   - ReadWriteOnce
